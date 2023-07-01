@@ -29,7 +29,7 @@ app.post("/insertData", async (req, res) => {
   }
 });
 
-app.post("/getAllLocations", async (req, res) => {
+app.get("/getAllLocations", async (req, res) => {
   try {
     await client.connect();
     const database = client.db("FOMO");
