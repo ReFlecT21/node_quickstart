@@ -29,6 +29,20 @@ app.post("/insertData", async (req, res) => {
   }
 });
 
+app.post("/getAllLocations", async (req, res) => {
+  try {
+    await client.connect();
+    const database = client.db("FOMO");
+    const collection = database.collection("locations");
+    const locations = await collection.find({}).toArray();
+    res.json(locations);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false });
+  } finally {
+    await client.close();
+  }
+});
 app.listen(process.env.PORT || 3000, () => {
   console.log("Server listening on port 3000");
 });
