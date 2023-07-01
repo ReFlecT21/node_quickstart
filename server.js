@@ -9,7 +9,7 @@ const uri =
   "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 
-app.get("/insertData", async (req, res) => {
+app.post("/insertData", async (req, res) => {
   const { latitude, longitude } = req.body;
   try {
     await client.connect();
