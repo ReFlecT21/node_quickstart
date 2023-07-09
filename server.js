@@ -10,7 +10,7 @@ const uri =
 const client = new MongoClient(uri);
 
 app.post("/insertData", async (req, res) => {
-  const { latitude, longitude } = req.body;
+  const { latitude, longitude, type } = req.body;
 
   try {
     await client.connect();
@@ -18,7 +18,7 @@ app.post("/insertData", async (req, res) => {
     const database = client.db("FOMO");
     const collection = database.collection("locations");
 
-    await collection.insertOne({ latitude, longitude });
+    await collection.insertOne({ latitude, longitude, type });
 
     res.json({ success: true });
   } catch (e) {
