@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
+const argon2 = require("argon2");
 
 const app = express();
 app.use(bodyParser.json());
@@ -37,8 +38,8 @@ app.post("/insertUser", async (req, res) => {
 
     const database = client.db("FOMO");
     const collection = database.collection("userinfo");
-
-    await collection.insertOne({ username, password });
+    const hash = await argon2.hash(password);
+    await collection.insertOne({ username, hash });
 
     res.json({ success: true });
   } catch (e) {
