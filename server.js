@@ -29,25 +29,25 @@ app.post("/insertData", async (req, res) => {
   }
 });
 
-app.post("/insertUser", async (req, res) => {
-  const { username, password } = req.body;
+// app.post("/insertUser", async (req, res) => {
+//   const { username, password } = req.body;
 
-  try {
-    await client.connect();
+//   try {
+//     await client.connect();
 
-    const database = client.db("FOMO");
-    const collection = database.collection("userinfo");
+//     const database = client.db("FOMO");
+//     const collection = database.collection("userinfo");
 
-    await collection.insertOne({ username, password });
+//     await collection.insertOne({ username, password });
 
-    res.json({ success: true });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ success: false });
-  } finally {
-    await client.close();
-  }
-});
+//     res.json({ success: true });
+//   } catch (e) {
+//     console.error(e);
+//     res.status(500).json({ success: false });
+//   } finally {
+//     await client.close();
+//   }
+// });
 
 app.get("/getAllLocations", async (req, res) => {
   try {
