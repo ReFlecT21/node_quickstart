@@ -50,6 +50,40 @@ app.post("/insertUser", async (req, res) => {
   }
 });
 
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    await client.connect();
+
+    const database = client.db("FOMO");
+    const collection = database.collection("userinfo");
+    const user = await collection.findOne({ username });
+
+    if (!user) {
+      res
+        .status(401)
+        .json({ success: false, message: "Invalid username or password" });
+      return;
+    }
+
+    const match = await bcrypt.compare(password, user.hash);
+    if (!match) {
+      res
+        .status(401)
+        .json({ success: false, message: "Invalid username or password" });
+      return;
+    }
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false });
+  } finally {
+    await client.close();
+  }
+});
+
 app.get("/getAllLocations", async (req, res) => {
   try {
     await client.connect();
