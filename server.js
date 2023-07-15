@@ -10,9 +10,9 @@ app.use(bodyParser.json());
 const uri =
   "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
-
+const server = http.createServer(app);
 // create a new instance of the Socket.IO server
-const io = new Server();
+const io = new Server(server);
 
 io.on("connection", (socket) => {
   socket.on("addMarker", async (marker) => {
