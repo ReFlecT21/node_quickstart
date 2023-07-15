@@ -17,14 +17,17 @@ const io = new Server();
 io.on("connection", (socket) => {
   socket.on("addMarker", async (marker) => {
     try {
-      console.log("Connecting to MongoDB database");
+      socket.emit("log", "Connecting to MongoDB database");
       await client.connect();
-      console.log("Connected to MongoDB database");
+      socket.emit("log", "Connected to MongoDB database");
       const database = client.db("FOMO");
       const collection = database.collection("locations");
-      console.log("Inserting marker into database:", marker);
+      socket.emit(
+        "log",
+        `Inserting marker into database: ${JSON.stringify(marker)}`
+      );
       await collection.insertOne(marker);
-      console.log("Inserted marker into database");
+      socket.emit("log", "Inserted marker into database");
       io.emit("newMarker", marker);
     } catch (e) {
       console.error(e);
