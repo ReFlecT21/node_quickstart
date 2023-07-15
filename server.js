@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
 const bcrypt = require("bcryptjs");
+const { Server } = require("socket.io");
 
 const app = express();
 app.use(bodyParser.json());
@@ -10,25 +11,44 @@ const uri =
   "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 
-app.post("/insertData", async (req, res) => {
-  const { latitude, longitude, type } = req.body;
+// create a new instance of the Socket.IO server
+const io = new Server();
 
-  try {
-    await client.connect();
-
-    const database = client.db("FOMO");
-    const collection = database.collection("locations");
-
-    await collection.insertOne({ latitude, longitude, type });
-
-    res.json({ success: true });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ success: false });
-  } finally {
-    await client.close();
-  }
+io.on("connection", (socket) => {
+  socket.on("addMarker", async (marker) => {
+    try {
+      await client.connect();
+      const database = client.db("FOMO");
+      const collection = database.collection("locations");
+      await collection.insertOne(marker);
+      io.emit("newMarker", marker);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      await client.close();
+    }
+  });
 });
+
+// app.post("/insertData", async (req, res) => {
+//   const { latitude, longitude, type } = req.body;
+
+//   try {
+//     await client.connect();
+
+//     const database = client.db("FOMO");
+//     const collection = database.collection("locations");
+
+//     await collection.insertOne({ latitude, longitude, type });
+
+//     res.json({ success: true });
+//   } catch (e) {
+//     console.error(e);
+//     res.status(500).json({ success: false });
+//   } finally {
+//     await client.close();
+//   }
+// });
 
 app.post("/insertUser", async (req, res) => {
   const { username, password } = req.body;
