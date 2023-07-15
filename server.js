@@ -66,9 +66,8 @@ app.post("/insertUser", async (req, res) => {
     const database = client.db("FOMO");
     const collection = database.collection("userinfo");
     const hash = await bcrypt.hash(password, 10);
-
+    console.log("yes");
     await collection.insertOne({ username, hash });
-
     res.json({ success: true });
   } catch (e) {
     console.error(e);
