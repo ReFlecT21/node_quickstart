@@ -2,8 +2,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
 const bcrypt = require("bcryptjs");
-const { Server } = require("socket.io");
-const { createAdapter } = require("@socket.io/mongo-adapter");
 
 const app = express();
 app.use(bodyParser.json());
@@ -11,15 +9,6 @@ app.use(bodyParser.json());
 const uri =
   "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
-
-// create a new instance of the adapter
-const mongoAdapter = createAdapter(uri);
-
-// create a new instance of the Socket.IO server
-const io = new Server();
-
-// set the adapter for the Socket.IO server
-io.adapter(mongoAdapter);
 
 app.post("/insertData", async (req, res) => {
   const { latitude, longitude, type } = req.body;
@@ -96,37 +85,20 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// app.get("/getAllLocations", async (req, res) => {
-//   try {
-//     await client.connect();
-//     const database = client.db("FOMO");
-//     const collection = database.collection("locations");
-//     const locations = await collection.find({}).toArray();
-//     res.json(locations);
-//   } catch (e) {
-//     console.error(e);
-//     res.status(500).json({ success: false });
-//   } finally {
-//     await client.close();
-//   }
-// });
-io.on("connection", (socket) => {
-  socket.on("getAllLocations", async () => {
-    try {
-      await client.connect();
-      const database = client.db("FOMO");
-      const collection = database.collection("locations");
-      const locations = await collection.find({}).toArray();
-      socket.emit("allLocations", locations);
-    } catch (e) {
-      console.error(e);
-      socket.emit("allLocations", []);
-    } finally {
-      await client.close();
-    }
-  });
+app.get("/getAllLocations", async (req, res) => {
+  try {
+    await client.connect();
+    const database = client.db("FOMO");
+    const collection = database.collection("locations");
+    const locations = await collection.find({}).toArray();
+    res.json(locations);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false });
+  } finally {
+    await client.close();
+  }
 });
-
 app.listen(process.env.PORT || 3000, () => {
   console.log("Server listening on port 3000");
 });
