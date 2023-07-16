@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { MongoClient } = require("mongodb");
+const { ObjectId } = require("mongodb");
 const bcrypt = require("bcryptjs");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -56,7 +57,9 @@ io.on("connection", (socket) => {
       const database = client.db("FOMO");
       const collection = database.collection("locations");
       socket.emit("log", `Removing marker with ID ${markerId} from database`);
-      const result = await collection.deleteOne({ _id: markerId });
+      const result = await collection.deleteOne({
+        _id: new ObjectId(markerId),
+      });
       socket.emit("log", "Removed marker from database");
       io.emit("markerRemoved", markerId);
     } catch (e) {
