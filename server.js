@@ -47,6 +47,25 @@ io.on("connection", (socket) => {
   });
 });
 
+io.on("connection", (socket) => {
+  socket.on("removeMarker", async (markerId) => {
+    try {
+      socket.emit("log", "Connecting to MongoDB database");
+      await client.connect();
+      socket.emit("log", "Connected to MongoDB database");
+      const database = client.db("FOMO");
+      const collection = database.collection("locations");
+      socket.emit("log", `Removing marker with ID ${markerId} from database`);
+      const result = await collection.deleteOne({ _id: markerId });
+      socket.emit("log", "Removed marker from database");
+      io.emit("markerRemoved", markerId);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      await client.close();
+    }
+  });
+});
 app.get("/checkAuth", (req, res) => {
   if (req.session.userId) {
     // user is authenticated
