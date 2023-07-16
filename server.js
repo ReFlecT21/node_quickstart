@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
       );
       await collection.insertOne(marker);
       socket.emit("log", "Inserted marker into database");
-      io.emit("newMarker", { ...marker, id: result.insertedId });
+      socket.emit("newMarker", { ...marker, id: result.insertedId });
     } catch (e) {
       console.error(e);
     } finally {
