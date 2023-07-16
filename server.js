@@ -27,7 +27,7 @@ io.on("connection", (socket) => {
         "log",
         `Inserting marker into database: ${JSON.stringify(marker)}`
       );
-      await collection.insertOne(marker);
+      const result = await collection.insertOne(marker);
       socket.emit("log", "Inserted marker into database");
       socket.emit("newMarker", { ...marker, id: result.insertedId });
     } catch (e) {
