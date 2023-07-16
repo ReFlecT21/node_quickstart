@@ -4,19 +4,19 @@ const { MongoClient } = require("mongodb");
 const bcrypt = require("bcryptjs");
 const http = require("http");
 const { Server } = require("socket.io");
-const session = require("express-session");
-const crypto = require("crypto");
-const secret = crypto.randomBytes(64).toString("hex");
+// const session = require("express-session");
+// const crypto = require("crypto");
+// const secret = crypto.randomBytes(64).toString("hex");
 const app = express();
 app.use(bodyParser.json());
-app.use(
-  session({
-    secret: secret,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 30 * 60 * 1000 }, // session expires after 30 minutes
-  })
-);
+// app.use(
+//   session({
+//     secret: secret,
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: { maxAge: 30 * 60 * 1000 }, // session expires after 30 minutes
+//   })
+// );
 const uri =
   "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
@@ -111,7 +111,7 @@ app.post("/login", async (req, res) => {
         .json({ success: false, message: "Invalid username or password" });
       return;
     }
-    req.session.userId = user.username;
+    // req.session.userId = user.username;
     res.json({ success: true });
   } catch (e) {
     console.error(e);
@@ -123,10 +123,10 @@ app.post("/login", async (req, res) => {
 
 app.get("/getAllLocations", async (req, res) => {
   // check if the user is authenticated
-  if (!req.session.userId) {
-    res.status(401).json({ success: false, message: "Not authenticated" });
-    return;
-  }
+  // if (!req.session.userId) {
+  //   res.status(401).json({ success: false, message: "Not authenticated" });
+  //   return;
+  // }
 
   try {
     await client.connect();
