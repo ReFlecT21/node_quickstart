@@ -57,6 +57,17 @@ app.get("/checkAuth", (req, res) => {
   }
 });
 
+app.get("/clearSessions", (req, res) => {
+  req.sessionStore.clear((err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ success: false });
+    } else {
+      res.json({ success: true });
+    }
+  });
+});
+
 app.post("/insertUser", async (req, res) => {
   const { username, password } = req.body;
 
