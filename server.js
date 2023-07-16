@@ -4,19 +4,19 @@ const { MongoClient } = require("mongodb");
 const bcrypt = require("bcryptjs");
 const http = require("http");
 const { Server } = require("socket.io");
-// const session = require("express-session");
-// const crypto = require("crypto");
-// const secret = crypto.randomBytes(64).toString("hex");
+const session = require("express-session");
+const crypto = require("crypto");
+const secret = crypto.randomBytes(64).toString("hex");
 const app = express();
 app.use(bodyParser.json());
-// app.use(
-//   session({
-//     secret: secret,
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { maxAge: 30 * 60 * 1000 }, // session expires after 30 minutes
-//   })
-// );
+app.use(
+  session({
+    secret: secret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 30 * 60 * 1000 }, // session expires after 30 minutes
+  })
+);
 const uri =
   "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
@@ -47,25 +47,15 @@ io.on("connection", (socket) => {
   });
 });
 
-// app.post("/insertData", async (req, res) => {
-//   const { latitude, longitude, type } = req.body;
-
-//   try {
-//     await client.connect();
-
-//     const database = client.db("FOMO");
-//     const collection = database.collection("locations");
-
-//     await collection.insertOne({ latitude, longitude, type });
-
-//     res.json({ success: true });
-//   } catch (e) {
-//     console.error(e);
-//     res.status(500).json({ success: false });
-//   } finally {
-//     await client.close();
-//   }
-// });
+app.get("/checkAuth", (req, res) => {
+  if (req.session.userId) {
+    // user is authenticated
+    res.json({ success: true });
+  } else {
+    // user is not authenticated
+    res.status(401).json({ success: false });
+  }
+});
 
 app.post("/insertUser", async (req, res) => {
   const { username, password } = req.body;
@@ -75,6 +65,16 @@ app.post("/insertUser", async (req, res) => {
 
     const database = client.db("FOMO");
     const collection = database.collection("userinfo");
+
+    // check if the username already exists in the database
+    const existingUser = await collection.findOne({ username });
+    if (existingUser) {
+      res
+        .status(400)
+        .json({ success: false, message: "This username already exists" });
+      return;
+    }
+
     const hash = await bcrypt.hash(password, 10);
     console.log("yes");
     await collection.insertOne({ username, hash });
@@ -111,7 +111,7 @@ app.post("/login", async (req, res) => {
         .json({ success: false, message: "Invalid username or password" });
       return;
     }
-    // req.session.userId = user.username;
+    req.session.userId = user.username;
     res.json({ success: true });
   } catch (e) {
     console.error(e);
@@ -122,12 +122,6 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/getAllLocations", async (req, res) => {
-  // check if the user is authenticated
-  // if (!req.session.userId) {
-  //   res.status(401).json({ success: false, message: "Not authenticated" });
-  //   return;
-  // }
-
   try {
     await client.connect();
     const database = client.db("FOMO");
