@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
       socket.emit("log", "Inserted marker into database");
       await collection.createIndex(
         { createdAt: 1 },
-        { expireAfterSeconds: 86400 }
+        { expireAfterSeconds: 10 }
       );
       io.emit("newMarker", { ...marker });
     } catch (e) {
