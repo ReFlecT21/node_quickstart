@@ -34,12 +34,17 @@ io.on("connection", (socket) => {
       socket.emit("log", "Connected to MongoDB database");
       const database = client.db("FOMO");
       const collection = database.collection("locations");
+      marker.createdAt = new Date();
       socket.emit(
         "log",
         `Inserting marker into database: ${JSON.stringify(marker)}`
       );
       const result = await collection.insertOne(marker);
       socket.emit("log", "Inserted marker into database");
+      await collection.createIndex(
+        { createdAt: 1 },
+        { expireAfterSeconds: 86400 }
+      );
       io.emit("newMarker", { ...marker });
     } catch (e) {
       console.error(e);
