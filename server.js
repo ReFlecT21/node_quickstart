@@ -6,25 +6,26 @@ const bcrypt = require("bcryptjs");
 const http = require("http");
 const { Server } = require("socket.io");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const crypto = require("crypto");
 const secret = crypto.randomBytes(64).toString("hex");
 const app = express();
 app.use(bodyParser.json());
-app.use(
-  session({
-    secret: secret,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 30 * 60 * 1000 }, // session expires after 30 minutes
-  })
-);
+
 const uri =
   "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 const server = http.createServer(app);
 // create a new instance of the Socket.IO server
 const io = new Server(server);
-
+app.use(
+  session({
+    secret: secret,
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({ mongoUrl: uri }),
+  })
+);
 io.on("connection", (socket) => {
   socket.on("addMarker", async (marker) => {
     try {
