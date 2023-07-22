@@ -83,8 +83,6 @@ io.on("connection", (socket) => {
       io.emit("newMarker", { ...marker });
     } catch (e) {
       console.error(e);
-    } finally {
-      await client.close();
     }
   });
 });
@@ -105,8 +103,6 @@ io.on("connection", (socket) => {
       io.emit("markerRemoved", markerId);
     } catch (e) {
       console.error(e);
-    } finally {
-      await client.close();
     }
   });
 });
@@ -157,8 +153,6 @@ app.post("/insertUser", async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ success: false });
-  } finally {
-    await client.close();
   }
 });
 
@@ -191,8 +185,6 @@ app.post("/login", async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ success: false });
-  } finally {
-    await client.close();
   }
 });
 
@@ -206,8 +198,6 @@ app.get("/getAllLocations", async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ success: false });
-  } finally {
-    await client.close();
   }
 });
 server.listen(process.env.PORT || 3000, () => {
