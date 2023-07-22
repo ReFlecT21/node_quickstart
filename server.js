@@ -59,29 +59,7 @@ io.on("connection", (socket) => {
     }
   });
 });
-setInterval(async () => {
-  try {
-    await client.connect();
-    const database = client.db("FOMO");
-    const collection = database.collection("locations");
 
-    // Query the database for expired markers
-    const expiredMarkers = await collection
-      .find({
-        /* query for expired markers */
-      })
-      .toArray();
-
-    // Emit a markerRemoved event for each expired marker
-    for (const marker of expiredMarkers) {
-      io.emit("markerRemoved", marker._id);
-    }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    await client.close();
-  }
-}, 1000);
 app.get("/checkAuth", (req, res) => {
   if (req.session.userId) {
     // user is authenticated
