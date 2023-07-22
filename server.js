@@ -28,6 +28,17 @@ app.use(
 );
 
 io.on("connection", (socket) => {
+  socket.on("addMarker", async (marker) => {
+    try {
+      marker.createdAt = new Date();
+      const result = await collection.insertOne(marker);
+      io.emit("newMarker", { ...marker });
+    } catch (e) {
+      console.error(e);
+    }
+  });
+});
+io.on("connection", (socket) => {
   socket.on("removeMarker", async (markerId) => {
     try {
       socket.emit("log", "Connecting to MongoDB database");
