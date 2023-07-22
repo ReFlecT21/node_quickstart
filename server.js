@@ -15,6 +15,7 @@ app.use(bodyParser.json());
 const uri =
   "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
+let changeStream;
 const server = http.createServer(app);
 // create a new instance of the Socket.IO server
 const io = new Server(server);
@@ -26,7 +27,26 @@ app.use(
     store: MongoStore.create({ mongoUrl: uri }),
   })
 );
+async function watchCollection() {
+  try {
+    await client.connect();
+    const database = client.db("FOMO");
+    const collection = database.collection("locations");
 
+    // Watch for changes in the locations collection
+    changeStream = collection.watch();
+    changeStream.on("change", (change) => {
+      if (change.operationType === "delete") {
+        const markerId = change.documentKey._id;
+        io.emit("markerRemoved", markerId);
+      }
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+watchCollection();
 io.on("connection", (socket) => {
   socket.on("addMarker", async (marker) => {
     try {
@@ -77,21 +97,12 @@ io.on("connection", (socket) => {
       socket.emit("log", "Connected to MongoDB database");
       const database = client.db("FOMO");
       const collection = database.collection("locations");
-
-      // Watch for changes in the locations collection
-      const changeStream = collection.watch();
-      changeStream.on("change", (change) => {
-        if (change.operationType === "delete") {
-          const markerId = change.documentKey._id;
-          io.emit("markerRemoved", markerId);
-        }
-      });
-
       socket.emit("log", `Removing marker with ID ${markerId} from database`);
       const result = await collection.deleteOne({
         _id: new ObjectId(markerId),
       });
       socket.emit("log", "Removed marker from database");
+      io.emit("markerRemoved", markerId);
     } catch (e) {
       console.error(e);
     } finally {
