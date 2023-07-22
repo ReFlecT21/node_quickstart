@@ -26,50 +26,51 @@ app.use(
     store: MongoStore.create({ mongoUrl: uri }),
   })
 );
-async function startServer() {
-  // Connect to the MongoDB database
-  await client.connect();
-  const database = client.db("FOMO");
-  const collection = database.collection("locations");
 
-  // Create the index with the expireAfterSeconds option
-  await collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 60 });
-
-  // Listen for the delete event on the change stream
-  const changeStream = collection.watch([
-    { $match: { operationType: "delete" } },
-  ]);
-  changeStream.on("change", (change) => {
-    // Emit a markerRemoved event with the deleted document's _id value
-    io.emit("markerRemoved", change.documentKey._id);
+io.on("connection", (socket) => {
+  socket.on("removeMarker", async (markerId) => {
+    try {
+      socket.emit("log", "Connecting to MongoDB database");
+      await client.connect();
+      socket.emit("log", "Connected to MongoDB database");
+      const database = client.db("FOMO");
+      const collection = database.collection("locations");
+      socket.emit("log", `Removing marker with ID ${markerId} from database`);
+      const result = await collection.deleteOne({
+        _id: new ObjectId(markerId),
+      });
+      socket.emit("log", "Removed marker from database");
+      io.emit("markerRemoved", markerId);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      await client.close();
+    }
   });
+});
+setInterval(async () => {
+  try {
+    await client.connect();
+    const database = client.db("FOMO");
+    const collection = database.collection("locations");
 
-  io.on("connection", (socket) => {
-    socket.on("addMarker", async (marker) => {
-      try {
-        marker.createdAt = new Date();
-        const result = await collection.insertOne(marker);
-        io.emit("newMarker", { ...marker });
-      } catch (e) {
-        console.error(e);
-      }
-    });
+    // Query the database for expired markers
+    const expiredMarkers = await collection
+      .find({
+        /* query for expired markers */
+      })
+      .toArray();
 
-    socket.on("removeMarker", async (markerId) => {
-      try {
-        const result = await collection.deleteOne({
-          _id: new ObjectId(markerId),
-        });
-        io.emit("markerRemoved", markerId);
-      } catch (e) {
-        console.error(e);
-      }
-    });
-  });
-}
-
-startServer();
-
+    // Emit a markerRemoved event for each expired marker
+    for (const marker of expiredMarkers) {
+      io.emit("markerRemoved", marker._id);
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await client.close();
+  }
+}, 1000);
 app.get("/checkAuth", (req, res) => {
   if (req.session.userId) {
     // user is authenticated
