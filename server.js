@@ -41,6 +41,7 @@ io.on("connection", (socket) => {
       );
       const result = await collection.insertOne(marker);
       socket.emit("log", "Inserted marker into database");
+      await collection.dropIndex({ createdAt: 1 });
       await collection.createIndex(
         { createdAt: 1 },
         { expireAfterSeconds: 10 }
