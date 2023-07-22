@@ -26,35 +26,23 @@ app.use(
     store: MongoStore.create({ mongoUrl: uri }),
   })
 );
+
+await client.connect();
+const database = client.db("FOMO");
+const collection = database.collection("locations");
+
+await collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 60 });
 io.on("connection", (socket) => {
   socket.on("addMarker", async (marker) => {
     try {
-      socket.emit("log", "Connecting to MongoDB database");
-      await client.connect();
-      socket.emit("log", "Connected to MongoDB database");
-      const database = client.db("FOMO");
-      const collection = database.collection("locations");
       marker.createdAt = new Date();
-      socket.emit(
-        "log",
-        `Inserting marker into database: ${JSON.stringify(marker)}`
-      );
       const result = await collection.insertOne(marker);
-      socket.emit("log", "Inserted marker into database");
-      await collection.dropIndex({ createdAt: 1 });
-      await collection.createIndex(
-        { createdAt: 1 },
-        { expireAfterSeconds: 10 }
-      );
       io.emit("newMarker", { ...marker });
     } catch (e) {
       console.error(e);
-    } finally {
-      await client.close();
     }
   });
 });
-
 io.on("connection", (socket) => {
   socket.on("removeMarker", async (markerId) => {
     try {
@@ -75,6 +63,13 @@ io.on("connection", (socket) => {
       await client.close();
     }
   });
+});
+const changeStream = collection.watch([
+  { $match: { operationType: "delete" } },
+]);
+changeStream.on("change", (change) => {
+  // Emit a markerRemoved event with the deleted document's _id value
+  io.emit("markerRemoved", change.documentKey._id);
 });
 app.get("/checkAuth", (req, res) => {
   if (req.session.userId) {
