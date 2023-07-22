@@ -80,13 +80,6 @@ io.on("connection", (socket) => {
     }
   });
 });
-const changeStream = collection.watch([
-  { $match: { operationType: "delete" } },
-]);
-changeStream.on("change", (change) => {
-  // Emit a markerRemoved event with the deleted document's _id value
-  io.emit("markerRemoved", change.documentKey._id);
-});
 app.get("/checkAuth", (req, res) => {
   if (req.session.userId) {
     // user is authenticated
