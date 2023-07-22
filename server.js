@@ -30,14 +30,32 @@ app.use(
 io.on("connection", (socket) => {
   socket.on("addMarker", async (marker) => {
     try {
+      socket.emit("log", "Connecting to MongoDB database");
+      await client.connect();
+      socket.emit("log", "Connected to MongoDB database");
+      const database = client.db("FOMO");
+      const collection = database.collection("locations");
       marker.createdAt = new Date();
+      socket.emit(
+        "log",
+        `Inserting marker into database: ${JSON.stringify(marker)}`
+      );
       const result = await collection.insertOne(marker);
+      socket.emit("log", "Inserted marker into database");
+      await collection.dropIndex({ createdAt: 1 });
+      await collection.createIndex(
+        { createdAt: 1 },
+        { expireAfterSeconds: 10 }
+      );
       io.emit("newMarker", { ...marker });
     } catch (e) {
       console.error(e);
+    } finally {
+      await client.close();
     }
   });
 });
+
 io.on("connection", (socket) => {
   socket.on("removeMarker", async (markerId) => {
     try {
