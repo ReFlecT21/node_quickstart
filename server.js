@@ -35,7 +35,7 @@ async function deleteExpiredMarkers() {
     const collection = database.collection("locations");
 
     // Calculate the expiration time
-    const expirationTime = process.hrtime.bigint() - BigInt(60 * 1e9);
+    const expirationTime = new Date(Date.now() - 60 * 1000);
 
     // Delete markers that are older than the expiration time
     const result = await collection.deleteMany({
@@ -77,7 +77,7 @@ io.on("connection", (socket) => {
       const database = client.db("FOMO");
       const collection = database.collection("locations");
 
-      marker.createdAt = process.hrtime.bigint();
+      marker.createdAt = new Date();
       socket.emit(
         "log",
         `Inserting marker into database: ${JSON.stringify(marker)}`
