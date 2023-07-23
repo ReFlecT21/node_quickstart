@@ -33,6 +33,7 @@ async function watchCollection() {
     const database = client.db("FOMO");
     const collection = database.collection("locations");
 
+    await collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 60 });
     // Watch for changes in the locations collection
     changeStream = collection.watch();
     changeStream.on("change", (change) => {
@@ -56,15 +57,6 @@ io.on("connection", (socket) => {
       const database = client.db("FOMO");
       const collection = database.collection("locations");
 
-      // Watch for changes in the locations collection
-      const changeStream = collection.watch();
-      changeStream.on("change", (change) => {
-        if (change.operationType === "delete") {
-          const markerId = change.documentKey._id;
-          io.emit("markerRemoved", markerId);
-        }
-      });
-
       marker.createdAt = new Date();
       socket.emit(
         "log",
@@ -72,14 +64,6 @@ io.on("connection", (socket) => {
       );
       const result = await collection.insertOne(marker);
       socket.emit("log", "Inserted marker into database");
-
-      // Change the expiration time of the TTL index to 60 seconds
-      await collection.dropIndex({ createdAt: 1 });
-      await collection.createIndex(
-        { createdAt: 1 },
-        { expireAfterSeconds: 60 }
-      );
-
       io.emit("newMarker", { ...marker });
     } catch (e) {
       console.error(e);
