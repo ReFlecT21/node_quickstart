@@ -9,6 +9,7 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const crypto = require("crypto");
 const secret = crypto.randomBytes(64).toString("hex");
+const cron = require("node-cron");
 const app = express();
 app.use(bodyParser.json());
 
@@ -27,13 +28,32 @@ app.use(
     store: MongoStore.create({ mongoUrl: uri }),
   })
 );
+async function deleteExpiredMarkers() {
+  try {
+    await client.connect();
+    const database = client.db("FOMO");
+    const collection = database.collection("locations");
+
+    // Calculate the expiration time
+    const expirationTime = new Date(Date.now() - 60 * 1000);
+
+    // Delete markers that are older than the expiration time
+    const result = await collection.deleteMany({
+      createdAt: { $lt: expirationTime },
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+// Schedule the task to run every minute
+cron.schedule("* * * * *", deleteExpiredMarkers);
 async function watchCollection() {
   try {
     await client.connect();
     const database = client.db("FOMO");
     const collection = database.collection("locations");
 
-    await collection.createIndex({ createdAt: 1 }, { expireAfterSeconds: 60 });
     // Watch for changes in the locations collection
     changeStream = collection.watch();
     changeStream.on("change", (change) => {
