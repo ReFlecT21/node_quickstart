@@ -35,7 +35,7 @@ async function deleteExpiredMarkers() {
     const collection = database.collection("locations");
 
     // Calculate the expiration time
-    const expirationTime = new Date(Date.now() - 60 * 1000);
+    const expirationTime = new Date(Date.now() - 5 * 60 * 1000);
 
     // Delete markers that are older than the expiration time
     const result = await collection.deleteMany({
