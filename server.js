@@ -28,26 +28,25 @@ app.use(
     store: MongoStore.create({ mongoUrl: uri }),
   })
 );
-async function deleteExpiredMarkers() {
+
+async function createTTLIndex() {
   try {
     await client.connect();
     const database = client.db("FOMO");
     const collection = database.collection("locations");
 
-    // Calculate the expiration time
-    const expirationTime = new Date(Date.now() - 5 * 60 * 1000);
-
-    // Delete markers that are older than the expiration time
-    const result = await collection.deleteMany({
-      createdAt: { $lt: expirationTime },
-    });
+    // Create a TTL index on the createdAt field with an expiration time of 5 minutes
+    await collection.createIndex(
+      { createdAt: 1 },
+      { expireAfterSeconds: 5 * 60 }
+    );
   } catch (e) {
     console.error(e);
   }
 }
 
-// Schedule the task to run every minute
-cron.schedule("* * * * *", deleteExpiredMarkers);
+createTTLIndex();
+
 async function watchCollection() {
   try {
     await client.connect();
@@ -110,7 +109,6 @@ io.on("connection", (socket) => {
     }
   });
 });
-
 app.get("/checkAuth", (req, res) => {
   if (req.session.userId) {
     // user is authenticated
