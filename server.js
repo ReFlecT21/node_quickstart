@@ -38,7 +38,7 @@ async function createTTLIndex() {
     // Create a TTL index on the createdAt field with an expiration time of 5 minutes
     await collection.createIndex(
       { createdAt: 1 },
-      { expireAfterSeconds: 5 * 60 }
+      { expireAfterSeconds: 5 * 24 * 60 * 60 }
     );
   } catch (e) {
     console.error(e);
