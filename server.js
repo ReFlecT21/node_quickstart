@@ -8,6 +8,9 @@ const { Server } = require("socket.io");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const crypto = require("crypto");
+const AWS = require("aws-sdk");
+const multer = require("multer");
+const multerS3 = require("multer-s3");
 const secret = crypto.randomBytes(64).toString("hex");
 const cron = require("node-cron");
 const app = express();
@@ -31,6 +34,24 @@ app.use(
     },
   })
 );
+const s3 = new AWS.S3({
+  accessKeyId: "AKIA5RUQCKPEB42WTHUA",
+  secretAccessKey: "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",
+});
+
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: "fomofinal",
+    acl: "public-read",
+    metadata: function (req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: function (req, file, cb) {
+      cb(null, Date.now().toString());
+    },
+  }),
+});
 
 async function createTTLIndex() {
   try {
@@ -120,6 +141,10 @@ app.get("/checkAuth", (req, res) => {
     // user is not authenticated
     res.status(401).json({ success: false });
   }
+});
+
+app.post("/upload", upload.array("photos", 3), function (req, res, next) {
+  res.send("Successfully uploaded " + req.files.length + " files!");
 });
 
 app.get("/clearSessions", (req, res) => {
