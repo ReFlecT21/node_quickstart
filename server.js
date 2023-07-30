@@ -37,12 +37,12 @@ async function createTTLIndex() {
     await client.connect();
     const database = client.db("FOMO");
     const collection = database.collection("locations");
-    await collection.dropIndex("createdAt_1");
-    // Create a TTL index on the createdAt field with an expiration time of 5 minutes
-    await collection.createIndex(
-      { createdAt: 1 },
-      { expireAfterSeconds: 5 * 24 * 60 * 60 }
-    );
+    // await collection.dropIndex("createdAt_1");
+    // // Create a TTL index on the createdAt field with an expiration time of 5 minutes
+    // await collection.createIndex(
+    //   { createdAt: 1 },
+    //   { expireAfterSeconds: 5 * 24 * 60 * 60 }
+    // );
   } catch (e) {
     console.error(e);
   }
@@ -79,7 +79,7 @@ io.on("connection", (socket) => {
       const database = client.db("FOMO");
       const collection = database.collection("locations");
 
-      marker.createdAt = new Date();
+      // marker.createdAt = new Date();
       socket.emit(
         "log",
         `Inserting marker into database: ${JSON.stringify(marker)}`
