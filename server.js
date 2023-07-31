@@ -158,6 +158,8 @@ app.post("/insertUser", async (req, res) => {
       hash,
       points: 0,
       joinedDate: new Date(),
+      NoOfMarkers: 0,
+      NoOfContributions: 0,
     });
     res.json({ success: true });
   } catch (e) {
@@ -222,6 +224,72 @@ app.post("/incrementUserPoints", async (req, res) => {
 
     // increment the points of the user with the specified username
     await collection.updateOne({ username: username }, { $inc: { points: 1 } });
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.post("/incrementUserMarkers", async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    await client.connect();
+
+    const database = client.db("FOMO");
+    const collection = database.collection("userinfo");
+
+    // increment the points of the user with the specified username
+    await collection.updateOne(
+      { username: username },
+      { $inc: { NoOfMarkers: 1 } }
+    );
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.post("/decrementUserMarkers", async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    await client.connect();
+
+    const database = client.db("FOMO");
+    const collection = database.collection("userinfo");
+
+    // increment the points of the user with the specified username
+    await collection.updateOne(
+      { username: username },
+      { $inc: { NoOfMarkers: -1 } }
+    );
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.post("/incrementUserContributions", async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    await client.connect();
+
+    const database = client.db("FOMO");
+    const collection = database.collection("userinfo");
+
+    // increment the points of the user with the specified username
+    await collection.updateOne(
+      { username: username },
+      { $inc: { NoOfContributions: 1 } }
+    );
 
     res.json({ success: true });
   } catch (e) {
