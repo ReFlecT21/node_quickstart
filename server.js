@@ -94,6 +94,31 @@ io.on("connection", (socket) => {
 });
 
 io.on("connection", (socket) => {
+  socket.on("updateMarker", async (marker) => {
+    try {
+      socket.emit("log", "Connecting to MongoDB database");
+      await client.connect();
+      socket.emit("log", "Connected to MongoDB database");
+      const database = client.db("FOMO");
+      const collection = database.collection("locations");
+
+      socket.emit(
+        "log",
+        `Updating marker in database: ${JSON.stringify(marker)}`
+      );
+      const result = await collection.updateOne(
+        { _id: marker._id },
+        { $set: { createdAt: new Date() } }
+      );
+      socket.emit("log", "Updated marker in database");
+      io.emit("updatedMarker", { ...marker, createdAt: new Date() });
+    } catch (e) {
+      console.error(e);
+    }
+  });
+});
+
+io.on("connection", (socket) => {
   socket.on("removeMarker", async (markerId) => {
     try {
       socket.emit("log", "Connecting to MongoDB database");
