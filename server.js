@@ -205,6 +205,26 @@ app.get("/getAllLocations", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
+
+app.post("/incrementUserPoints", async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    await client.connect();
+
+    const database = client.db("FOMO");
+    const collection = database.collection("userinfo");
+
+    // increment the points of the user with the specified username
+    await collection.updateOne({ username: username }, { $inc: { points: 1 } });
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false });
+  }
+});
+
 server.listen(process.env.PORT || 3000, () => {
   console.log("Server listening on port 3000");
 });
