@@ -153,7 +153,12 @@ app.post("/insertUser", async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
     console.log("yes");
-    await collection.insertOne({ username, hash, points: 0 });
+    await collection.insertOne({
+      username,
+      hash,
+      points: 0,
+      joinedDate: new Date(),
+    });
     res.json({ success: true });
   } catch (e) {
     console.error(e);
