@@ -279,6 +279,27 @@ app.post("/incrementUserMarkers", async (req, res) => {
   }
 });
 
+app.get("/getNoOfMarkers", async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    await client.connect();
+
+    const database = client.db("FOMO");
+    const collection = database.collection("userinfo");
+
+    // find the user with the given username
+    const user = await collection.findOne({ username });
+
+    // retrieve the NoOfMarkers field
+    const noOfMarkers = user.NoOfMarkers;
+    res.json(noOfMarkers);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false });
+  }
+});
+
 app.post("/decrementUserMarkers", async (req, res) => {
   const { username } = req.body;
 
