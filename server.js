@@ -279,8 +279,8 @@ app.post("/incrementUserMarkers", async (req, res) => {
   }
 });
 
-app.get("/getNoOfMarkers", async (req, res) => {
-  const { username } = req.body;
+app.get("/getNoOfMarkers/:username", async (req, res) => {
+  const { username } = req.params;
 
   try {
     await client.connect();
@@ -290,10 +290,14 @@ app.get("/getNoOfMarkers", async (req, res) => {
 
     // find the user with the given username
     const user = await collection.findOne({ username });
+    if (!user) {
+      res.status(404).json({ success: false, message: "User not found" });
+      return;
+    }
 
     // retrieve the NoOfMarkers field
     const noOfMarkers = user.NoOfMarkers;
-    res.json(noOfMarkers);
+    res.json({ success: true, noOfMarkers });
   } catch (e) {
     console.error(e);
     res.status(500).json({ success: false });
