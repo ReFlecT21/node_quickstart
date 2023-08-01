@@ -237,9 +237,32 @@ app.get("/getAllLocations", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
+io.on("connection", (socket) => {
+  socket.on("incrementUserPoints", async (username) => {
+    try {
+      await client.connect();
 
-app.post("/incrementUserPoints", async (req, res) => {
-  const { username } = req.body;
+      const database = client.db("FOMO");
+      const collection = database.collection("userinfo");
+
+      // increment the points field of the user with the specified username
+      const result = await collection.findOneAndUpdate(
+        { username: username },
+        { $inc: { points: 1 } },
+        { returnDocument: "after" }
+      );
+
+      const points = result.value.points;
+      io.emit("incrementUserPointsSuccess", points);
+    } catch (e) {
+      console.error(e);
+      io.emit("incrementUserPointsError");
+    }
+  });
+});
+
+app.get("/getPoints/:username", async (req, res) => {
+  const { username } = req.params;
 
   try {
     await client.connect();
@@ -247,10 +270,16 @@ app.post("/incrementUserPoints", async (req, res) => {
     const database = client.db("FOMO");
     const collection = database.collection("userinfo");
 
-    // increment the points of the user with the specified username
-    await collection.updateOne({ username: username }, { $inc: { points: 1 } });
+    // find the user with the given username
+    const user = await collection.findOne({ username });
+    if (!user) {
+      res.status(404).json({ success: false, message: "User not found" });
+      return;
+    }
 
-    res.json({ success: true });
+    // retrieve the points field
+    const points = user.points;
+    res.json({ success: true, points });
   } catch (e) {
     console.error(e);
     res.status(500).json({ success: false });
@@ -305,31 +334,55 @@ app.get("/getNoOfMarkers/:username", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
+io.on("connection", (socket) => {
+  socket.on("decrementUserMarkers", async (username) => {
+    try {
+      await client.connect();
 
-app.post("/decrementUserMarkers", async (req, res) => {
-  const { username } = req.body;
+      const database = client.db("FOMO");
+      const collection = database.collection("userinfo");
 
-  try {
-    await client.connect();
+      // increment the NoOfMarkers field of the user with the specified username
+      const result = await collection.findOneAndUpdate(
+        { username: username },
+        { $inc: { NoOfMarkers: -1 } },
+        { returnDocument: "after" }
+      );
 
-    const database = client.db("FOMO");
-    const collection = database.collection("userinfo");
+      const noOfMarkers = result.value.NoOfMarkers;
+      socket.emit("decrementUserMarkersSuccess", noOfMarkers);
+    } catch (e) {
+      console.error(e);
+      socket.emit("incrementUserMarkersError");
+    }
+  });
+});
+io.on("connection", (socket) => {
+  socket.on("incrementUserContributions", async (username) => {
+    try {
+      await client.connect();
 
-    // increment the points of the user with the specified username
-    await collection.updateOne(
-      { username: username },
-      { $inc: { NoOfMarkers: -1 } }
-    );
+      const database = client.db("FOMO");
+      const collection = database.collection("userinfo");
 
-    res.json({ success: true });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ success: false });
-  }
+      // increment the NoOfMarkers field of the user with the specified username
+      const result = await collection.findOneAndUpdate(
+        { username: username },
+        { $inc: { NoOfContributions: 1 } },
+        { returnDocument: "after" }
+      );
+
+      const NoOfContributions = result.value.NoOfContributions;
+      socket.emit("incrementUserContributionsSuccess", NoOfContributions);
+    } catch (e) {
+      console.error(e);
+      socket.emit("incrementUserMarkersError");
+    }
+  });
 });
 
-app.post("/incrementUserContributions", async (req, res) => {
-  const { username } = req.body;
+app.get("/getNoOfContributions/:username", async (req, res) => {
+  const { username } = req.params;
 
   try {
     await client.connect();
@@ -337,13 +390,16 @@ app.post("/incrementUserContributions", async (req, res) => {
     const database = client.db("FOMO");
     const collection = database.collection("userinfo");
 
-    // increment the points of the user with the specified username
-    await collection.updateOne(
-      { username: username },
-      { $inc: { NoOfContributions: 1 } }
-    );
+    // find the user with the given username
+    const user = await collection.findOne({ username });
+    if (!user) {
+      res.status(404).json({ success: false, message: "User not found" });
+      return;
+    }
 
-    res.json({ success: true });
+    // retrieve the NoOfContributions field
+    const NoOfContributions = user.NoOfContributions;
+    res.json({ success: true, NoOfContributions });
   } catch (e) {
     console.error(e);
     res.status(500).json({ success: false });
