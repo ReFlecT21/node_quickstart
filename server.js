@@ -281,6 +281,31 @@ io.on("connection", (socket) => {
   });
 });
 
+app.get("/getNoOfMarkers/:username", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    await client.connect();
+
+    const database = client.db("FOMO");
+    const collection = database.collection("userinfo");
+
+    // find the user with the given username
+    const user = await collection.findOne({ username });
+    if (!user) {
+      res.status(404).json({ success: false, message: "User not found" });
+      return;
+    }
+
+    // retrieve the NoOfMarkers field
+    const noOfMarkers = user.NoOfMarkers;
+    res.json({ success: true, noOfMarkers });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false });
+  }
+});
+
 app.post("/decrementUserMarkers", async (req, res) => {
   const { username } = req.body;
 
