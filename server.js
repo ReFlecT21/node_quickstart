@@ -257,51 +257,28 @@ app.post("/incrementUserPoints", async (req, res) => {
   }
 });
 
-app.post("/incrementUserMarkers", async (req, res) => {
-  const { username } = req.body;
+io.on("connection", (socket) => {
+  socket.on("incrementUserMarkers", async (username) => {
+    try {
+      await client.connect();
 
-  try {
-    await client.connect();
+      const database = client.db("FOMO");
+      const collection = database.collection("userinfo");
 
-    const database = client.db("FOMO");
-    const collection = database.collection("userinfo");
+      // increment the NoOfMarkers field of the user with the specified username
+      const result = await collection.findOneAndUpdate(
+        { username: username },
+        { $inc: { NoOfMarkers: 1 } },
+        { returnDocument: "after" }
+      );
 
-    // increment the points of the user with the specified username
-    await collection.updateOne(
-      { username: username },
-      { $inc: { NoOfMarkers: 1 } }
-    );
-
-    res.json({ success: true });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ success: false });
-  }
-});
-
-app.get("/getNoOfMarkers/:username", async (req, res) => {
-  const { username } = req.params;
-
-  try {
-    await client.connect();
-
-    const database = client.db("FOMO");
-    const collection = database.collection("userinfo");
-
-    // find the user with the given username
-    const user = await collection.findOne({ username });
-    if (!user) {
-      res.status(404).json({ success: false, message: "User not found" });
-      return;
+      const noOfMarkers = result.value.NoOfMarkers;
+      socket.emit("incrementUserMarkersSuccess", noOfMarkers);
+    } catch (e) {
+      console.error(e);
+      socket.emit("incrementUserMarkersError");
     }
-
-    // retrieve the NoOfMarkers field
-    const noOfMarkers = user.NoOfMarkers;
-    res.json({ success: true, noOfMarkers });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ success: false });
-  }
+  });
 });
 
 app.post("/decrementUserMarkers", async (req, res) => {
