@@ -193,6 +193,25 @@ app.post("/insertUser", async (req, res) => {
   }
 });
 
+app.get("/getJoinedYear/:username", async (req, res) => {
+  const { username } = req.params;
+  try {
+    await client.connect();
+    const database = client.db("FOMO");
+    const collection = database.collection("userinfo");
+    const user = await collection.findOne({ username });
+    if (user) {
+      const joinedYear = user.joinedDate.getFullYear();
+      res.json({ success: true, joinedYear });
+    } else {
+      res.status(404).json({ success: false, message: "User not found" });
+    }
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false });
+  }
+});
+
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
