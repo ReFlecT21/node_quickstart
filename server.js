@@ -8,10 +8,16 @@ const { Server } = require("socket.io");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const crypto = require("crypto");
+const AWS = require("aws-sdk");
 const secret = crypto.randomBytes(64).toString("hex");
 const cron = require("node-cron");
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
+
 app.use(bodyParser.json());
+AWS.config.update({ region: "us-east-1" });
+const s3 = new AWS.S3({ apiVersion: "2006-03-01" });
 
 const uri =
   "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
@@ -31,6 +37,30 @@ app.use(
     },
   })
 );
+app.post("/upload", upload.single("file"), (req, res) => {
+  // Get the key parameter from the request body or query string
+  const key = req.body.key || req.query.key;
+
+  // Set the parameters for the upload
+  const uploadParams = {
+    Bucket: "fomopics",
+    Key: key,
+    Body: req.file.buffer, // Set the file data from the request body
+    ContentType: "image/jpeg", // Set the content type of the file
+  };
+
+  // Call S3 to upload the file to the bucket
+  s3.upload(uploadParams, function (err, data) {
+    if (err) {
+      console.log("Error", err);
+      res.status(500).send(err);
+    }
+    if (data) {
+      console.log("Upload Success", data.Location);
+      res.status(200).send(data);
+    }
+  });
+});
 
 async function createTTLIndex() {
   try {
