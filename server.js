@@ -17,7 +17,11 @@ const app = express();
 
 app.use(bodyParser.json());
 AWS.config.update({ region: "us-east-1" });
-const s3 = new AWS.S3({ apiVersion: "2006-03-01" });
+const s3 = new AWS.S3({
+  apiVersion: "2006-03-01",
+  accessKeyId: "AKIA5RUQCKPECD4EPGXL",
+  secretAccessKey: "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",
+});
 
 const uri =
   "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
