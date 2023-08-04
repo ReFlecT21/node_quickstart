@@ -9,18 +9,59 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const crypto = require("crypto");
 const AWS = require("aws-sdk");
+require("dotenv").config();
 const secret = crypto.randomBytes(64).toString("hex");
 const cron = require("node-cron");
-const multer = require("multer");
-const upload = multer({ storage: multer.memoryStorage() });
 const app = express();
 
 app.use(bodyParser.json());
-AWS.config.update({ region: "us-east-1" });
-const s3 = new AWS.S3({
-  apiVersion: "2006-03-01",
-  accessKeyId: "AKIA5RUQCKPECD4EPGXL",
-  secretAccessKey: "Qa7mVWYOPL+N3BKTizjptNJR+DUyrlUVyIHYGY9V",
+const express = require("express");
+const multer = require("multer");
+const AWS = require("aws-sdk");
+
+// Replace with your own AWS credentials and S3 bucket name
+const awsConfig = {
+  region: "us-east-1",
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  bucketName: "fomopics",
+};
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+// Configure AWS
+AWS.config.update(awsConfig);
+const s3 = new AWS.S3();
+
+// Define the POST endpoint for uploading the image
+app.post("/upload", upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file provided" });
+  }
+
+  const imageContent = req.file.buffer;
+  const fileName = req.file.originalname;
+
+  const params = {
+    Bucket: awsConfig.bucketName,
+    Key: fileName,
+    Body: imageContent,
+  };
+
+  // Upload the image to S3
+  s3.upload(params, (err, data) => {
+    if (err) {
+      console.error("Error uploading image:", err);
+      return res.status(500).json({ error: "Failed to upload image to S3" });
+    }
+
+    // The image was successfully uploaded to S3
+    // The S3 URL of the image is available in the 'Location' property of 'data'
+    const imageUrl = data.Location;
+    console.log("Image uploaded to:", imageUrl);
+    res.status(200).json({ imageUrl });
+  });
 });
 
 const uri =
