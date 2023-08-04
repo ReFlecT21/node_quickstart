@@ -8,7 +8,6 @@ const { Server } = require("socket.io");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const crypto = require("crypto");
-const AWS = require("aws-sdk");
 require("dotenv").config();
 const secret = crypto.randomBytes(64).toString("hex");
 const cron = require("node-cron");
