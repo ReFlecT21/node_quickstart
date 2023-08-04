@@ -15,7 +15,6 @@ const cron = require("node-cron");
 const app = express();
 
 app.use(bodyParser.json());
-const express = require("express");
 const multer = require("multer");
 const AWS = require("aws-sdk");
 
