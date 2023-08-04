@@ -13,6 +13,9 @@ const secret = crypto.randomBytes(64).toString("hex");
 const cron = require("node-cron");
 const app = express();
 
+const uri =
+  "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
+const client = new MongoClient(uri);
 app.use(bodyParser.json());
 const multer = require("multer");
 const AWS = require("aws-sdk");
@@ -48,7 +51,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
   };
 
   // Upload the image to S3
-  s3.upload(params, (err, data) => {
+  s3.upload(params, async (err, data) => {
     if (err) {
       console.error("Error uploading image:", err);
       return res.status(500).json({ error: "Failed to upload image to S3" });
@@ -58,13 +61,28 @@ app.post("/upload", upload.single("image"), (req, res) => {
     // The S3 URL of the image is available in the 'Location' property of 'data'
     const imageUrl = data.Location;
     console.log("Image uploaded to:", imageUrl);
+
+    // Store the image URL in your MongoDB database
+    try {
+      // Connect to your MongoDB database
+      await client.connect();
+      // Get a reference to your database
+      const db = client.db("FOMO");
+      // Get a reference to your collection
+      const collection = db.collection("locations");
+      // Insert a new document with the image URL
+      await collection.insertOne({ imageUrl });
+      console.log("Image URL stored in database");
+    } catch (error) {
+      console.error("Error storing image URL in database:", error);
+    } finally {
+      await client.close();
+    }
+
     res.status(200).json({ imageUrl });
   });
 });
 
-const uri =
-  "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(uri);
 let changeStream;
 const server = http.createServer(app);
 // create a new instance of the Socket.IO server
