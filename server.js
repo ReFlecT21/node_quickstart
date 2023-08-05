@@ -239,7 +239,7 @@ app.get("/checkAuth", (req, res) => {
 });
 
 app.get("/clearSessions", (req, res) => {
-  req.sessionStore.clear((err) => {
+  req.session.destroy((err) => {
     if (err) {
       console.error(err);
       res.status(500).json({ success: false });
