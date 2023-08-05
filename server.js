@@ -161,9 +161,52 @@ async function watchCollection() {
 }
 
 watchCollection();
+// io.on("connection", (socket) => {
+//   socket.on("addMarker", async (marker) => {
+//     try {
+//       socket.emit("log", "Connecting to MongoDB database");
+//       await client.connect();
+//       socket.emit("log", "Connected to MongoDB database");
+//       const database = client.db("FOMO");
+//       const collection = database.collection("locations");
+
+//       marker.createdAt = new Date();
+//       socket.emit(
+//         "log",
+//         `Inserting marker into database: ${JSON.stringify(marker)}`
+//       );
+//       const result = await collection.insertOne(marker);
+//       socket.emit("log", "Inserted marker into database");
+//       io.emit("newMarker", { ...marker });
+//     } catch (e) {
+//       console.error(e);
+//     }
+//   });
+// });
 io.on("connection", (socket) => {
-  socket.on("addMarker", async (marker) => {
+  socket.on("addMarker", async (data) => {
     try {
+      const { marker, imageContent, fileName } = data;
+
+      // Upload the image to S3
+      const params = {
+        Bucket: awsConfig.bucketName,
+        Key: fileName,
+        Body: imageContent,
+      };
+
+      let imageUrl;
+      try {
+        const uploadResult = await s3.upload(params).promise();
+        imageUrl = uploadResult.Location;
+        console.log("Image uploaded to:", imageUrl);
+      } catch (err) {
+        console.error("Error uploading image:", err);
+        socket.emit("uploadError", "Failed to upload image to S3");
+        return;
+      }
+
+      // Store the marker and image URL in your MongoDB database
       socket.emit("log", "Connecting to MongoDB database");
       await client.connect();
       socket.emit("log", "Connected to MongoDB database");
@@ -171,6 +214,7 @@ io.on("connection", (socket) => {
       const collection = database.collection("locations");
 
       marker.createdAt = new Date();
+      marker.imageUrl = imageUrl;
       socket.emit(
         "log",
         `Inserting marker into database: ${JSON.stringify(marker)}`
