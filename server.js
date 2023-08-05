@@ -98,30 +98,6 @@ app.use(
     },
   })
 );
-app.post("/upload", upload.single("file"), (req, res) => {
-  // Get the key parameter from the request body or query string
-  const key = req.body.key || req.query.key;
-
-  // Set the parameters for the upload
-  const uploadParams = {
-    Bucket: "fomopics",
-    Key: key,
-    Body: req.file.buffer, // Set the file data from the request body
-    ContentType: "image/jpeg", // Set the content type of the file
-  };
-
-  // Call S3 to upload the file to the bucket
-  s3.upload(uploadParams, function (err, data) {
-    if (err) {
-      console.log("Error", err);
-      res.status(500).send(err);
-    }
-    if (data) {
-      console.log("Upload Success", data.Location);
-      res.status(200).send(data);
-    }
-  });
-});
 
 async function createTTLIndex() {
   try {
@@ -187,7 +163,7 @@ io.on("connection", (socket) => {
   socket.on("addMarker", async (data) => {
     try {
       const { marker, imageContent, fileName } = data;
-
+      console.log("yes");
       // Upload the image to S3
       const params = {
         Bucket: awsConfig.bucketName,
