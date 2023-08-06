@@ -86,7 +86,9 @@ app.post("/upload", upload.single("image"), (req, res) => {
 let changeStream;
 const server = http.createServer(app);
 // create a new instance of the Socket.IO server
-const io = new Server(server);
+const io = new Server(server, {
+  maxHttpBufferSize: 1e8, // 100 MB
+});
 app.use(
   session({
     secret: secret,
