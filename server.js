@@ -23,8 +23,8 @@ const AWS = require("aws-sdk");
 // Replace with your own AWS credentials and S3 bucket name
 const awsConfig = {
   region: "us-east-1",
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  accessKeyId: "AKIA5RUQCKPECD4EPGXL",
+  secretAccessKey: "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",
   bucketName: "fomopics",
 };
 
