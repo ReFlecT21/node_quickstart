@@ -50,38 +50,6 @@ app.post("/upload", upload.single("image"), (req, res) => {
     Body: imageContent,
   };
 
-  // Upload the image to S3
-  s3.upload(params, async (err, data) => {
-    if (err) {
-      console.error("Error uploading image:", err);
-      return res.status(500).json({ error: "Failed to upload image to S3" });
-    }
-
-    // The image was successfully uploaded to S3
-    // The S3 URL of the image is available in the 'Location' property of 'data'
-    const imageUrl = data.Location;
-    console.log("Image uploaded to:", imageUrl);
-
-    // Store the image URL in your MongoDB database
-    try {
-      // Connect to your MongoDB database
-      await client.connect();
-      // Get a reference to your database
-      const db = client.db("FOMO");
-      // Get a reference to your collection
-      const collection = db.collection("locations");
-      // Insert a new document with the image URL
-      await collection.insertOne({ imageUrl });
-      console.log("Image URL stored in database");
-    } catch (error) {
-      console.error("Error storing image URL in database:", error);
-    } finally {
-      await client.close();
-    }
-
-    res.status(200).json({ imageUrl });
-  });
-});
 
 let changeStream;
 const server = http.createServer(app);
