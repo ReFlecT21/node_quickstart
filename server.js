@@ -13,8 +13,7 @@ const secret = crypto.randomBytes(64).toString("hex");
 const cron = require("node-cron");
 const app = express();
 
-const uri =
-  "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
+const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 app.use(bodyParser.json());
 const multer = require("multer");
