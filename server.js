@@ -220,7 +220,7 @@ io.on("connection", (socket) => {
         `Updating marker in database: ${JSON.stringify(marker)}`
       );
       const result = await collection.updateOne(
-        { _id: marker._id },
+        { _id: new ObjectId(marker._id) },
         { $set: { verify: username, createdAt: new Date() } }
       );
       socket.emit("log", "Updated marker in database");
