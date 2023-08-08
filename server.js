@@ -235,6 +235,26 @@ io.on("connection", (socket) => {
   });
 });
 
+app.get("/getMarkers", async (req, res) => {
+  try {
+    await client.connect();
+
+    const database = client.db("FOMO");
+    const collection = database.collection("locations");
+
+    // Find all markers in the collection
+    const markers = await collection
+      .find({})
+      .project({ verificationDate: 1, verify: 1 })
+      .toArray();
+
+    res.json({ success: true, markers });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 io.on("connection", (socket) => {
   socket.on("removeMarker", async (markerId) => {
     try {
