@@ -207,7 +207,7 @@ io.on("connection", (socket) => {
 });
 
 io.on("connection", (socket) => {
-  socket.on("updateMarker", async (marker) => {
+  socket.on("updateMarker", async (marker, username) => {
     try {
       socket.emit("log", "Connecting to MongoDB database");
       await client.connect();
@@ -221,10 +221,14 @@ io.on("connection", (socket) => {
       );
       const result = await collection.updateOne(
         { _id: marker._id },
-        { $set: { createdAt: new Date() } }
+        { $set: { verify: username, createdAt: new Date() } }
       );
       socket.emit("log", "Updated marker in database");
-      io.emit("updatedMarker", { ...marker, createdAt: new Date() });
+      io.emit("updatedMarker", {
+        ...marker,
+        verify: username,
+        createdAt: new Date(),
+      });
     } catch (e) {
       console.error(e);
     }
