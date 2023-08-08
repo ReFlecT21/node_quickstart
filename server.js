@@ -221,13 +221,13 @@ io.on("connection", (socket) => {
       );
       const result = await collection.updateOne(
         { _id: new ObjectId(marker._id) },
-        { $set: { verify: username, createdAt: new Date() } }
+        { $set: { verify: username, verificationDate: new Date() } }
       );
       socket.emit("log", "Updated marker in database");
       io.emit("updatedMarker", {
         ...marker,
         verify: username,
-        createdAt: new Date(),
+        verificationDate: new Date(),
       });
     } catch (e) {
       console.error(e);
