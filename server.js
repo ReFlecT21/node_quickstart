@@ -21,10 +21,10 @@ const AWS = require("aws-sdk");
 
 // Replace with your own AWS credentials and S3 bucket name
 const awsConfig = {
-  region: "us-east-1",
+  region: "ap-southeast-1",
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  bucketName: "fomofinal",
+  bucketName: "fomos3",
 };
 
 const storage = multer.memoryStorage();
