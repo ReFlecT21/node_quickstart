@@ -561,6 +561,6 @@ app.get("/getNoOfContributions/:username", async (req, res) => {
   }
 });
 
-server.listen(process.env.PORT || 3000, () => {
+server.listen(process.env.PORT || 8000, () => {
   console.log("Server listening on port 3000");
 });
