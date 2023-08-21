@@ -106,7 +106,7 @@ async function createTTLIndex() {
     await client.connect();
     const database = client.db("FOMO");
     const collection = database.collection("locations");
-
+    await collection.dropIndex("createdAt_1");
     // Create a TTL index on the createdAt field with an expiration time of 5 minutes
     await collection.createIndex(
       { createdAt: 1 },
