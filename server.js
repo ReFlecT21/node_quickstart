@@ -14,7 +14,7 @@ const cron = require("node-cron");
 const app = express();
 
 const uri =
-  "mongodb+srv://kumaraguru818:yhujik123@locations.3wjfclo.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://kumaraguru818:yhujik123@cluster0.zqmvrnr.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 app.use(bodyParser.json());
 const multer = require("multer");
