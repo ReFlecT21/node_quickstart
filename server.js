@@ -561,7 +561,7 @@ app.get("/getNoOfContributions/:username", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-const publicIpAddress = "3.86.11.208";
+const publicIpAddress = "https://3.86.11.208/";
 server.listen(process.env.PORT || 3000, publicIpAddress, () => {
   console.log(`Server listening on ${publicIpAddress}:3000`);
 });
