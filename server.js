@@ -9,6 +9,9 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const crypto = require("crypto");
 require("dotenv").config();
+const morgan = require("morgan");
+const fs = require("fs");
+const path = require("path");
 const secret = crypto.randomBytes(64).toString("hex");
 const cron = require("node-cron");
 const app = express();
@@ -26,10 +29,13 @@ const awsConfig = {
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   bucketName: "fomos3",
 };
-
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" }
+);
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
+app.use(morgan("combined", { stream: accessLogStream }));
 // Configure AWS
 AWS.config.update(awsConfig);
 const s3 = new AWS.S3();
