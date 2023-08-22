@@ -170,7 +170,7 @@ io.on("connection", (socket) => {
   socket.on("addMarker", async (data) => {
     try {
       const { marker, imageContent, fileName } = data;
-      console.log("yes");
+      socket.emit("log", "uploading to s3...");
       // Upload the image to S3
       const params = {
         Bucket: awsConfig.bucketName,
