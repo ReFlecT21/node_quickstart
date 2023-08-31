@@ -318,6 +318,34 @@ app.post("/insertUser", async (req, res) => {
       return;
     }
 
+    app.post("/incrementTotalRatings", async (req, res) => {
+      const { markerID, number } = req.body;
+
+      try {
+        await client.connect();
+
+        const database = client.db("FOMO");
+        const collection = database.collection("locations");
+
+        // increment the totalratings field of the specified markerid
+        const result = await collection.updateOne(
+          { _id: new ObjectId(markerID) },
+          { $inc: { totalratings: number } }
+        );
+
+        if (result.modifiedCount === 1) {
+          res.json({ success: true });
+        } else {
+          res.status(400).json({ success: false, message: "Marker not found" });
+        }
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false });
+      } finally {
+        await client.close();
+      }
+    });
+
     const hash = await bcrypt.hash(password, 10);
     console.log("yes");
     await collection.insertOne({
