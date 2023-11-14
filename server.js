@@ -270,7 +270,7 @@ io.on("connection", (socket) => {
       );
       const result = await collection.updateOne(
         { _id: new ObjectId(markerId) },
-        { $set: reviewUpdate, $set: { rating: newRating } }
+        { $set: { reviews: reviewUpdate, rating: newRating } }
       );
       socket.emit("log", "Updated review in database");
       io.emit("updatedReview", {
