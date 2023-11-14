@@ -18,7 +18,6 @@ const { exec } = require('child_process');
 const app = express();
 
 
-console.log(scrape)
 
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
