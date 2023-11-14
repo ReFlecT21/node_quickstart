@@ -269,7 +269,7 @@ io.on("connection", (socket) => {
         `Updating review in database: ${JSON.stringify(reviewUpdate)}`
       );
       const result = await collection.updateOne(
-        { _id: new ObjectId(review._id) },
+        { _id: new ObjectId(markerId) },
         { $set: reviewUpdate, $set: { rating: newRating } }
       );
       socket.emit("log", "Updated review in database");
