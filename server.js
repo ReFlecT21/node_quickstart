@@ -275,11 +275,6 @@ io.on("connection", (socket) => {
         { $set: { reviews: reviewUpdate, rating: newRating } }
       );
       socket.emit("log", "Updated review in database");
-      io.emit("updatedReview", {
-        ...review,
-        rating: newRating,
-        reviews: reviewUpdate,
-      });
     } catch (e) {
       console.error(e);
     }
