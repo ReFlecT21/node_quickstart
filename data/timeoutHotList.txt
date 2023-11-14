@@ -1,0 +1,90 @@
+[
+  {
+    "title": "Gallery Underground",
+    "imgSrc": "https://media.timeout.com/images/106060847/750/562/image.jpg",
+    "url": "https://www.timeout.com/singapore/things-to-do/gallery-underground",
+    "address": "National Gallery Singapore, 1 St Andrew’s Rd, Singapore, 178957",
+    "price": "$200-$1200",
+    "startEndDate": [
+      "2023-11-17T21:00:00+08:00",
+      "2023-11-17T21:00:00+08:00"
+    ]
+  },
+  {
+    "title": "Singapore Writers Festival 2023",
+    "imgSrc": "https://media.timeout.com/images/106058975/750/562/image.jpg",
+    "url": "https://www.timeout.com/singapore/things-to-do/singapore-writers-festival-2023-1",
+    "address": "",
+    "price": "$30 (adults), $15 (youth)",
+    "startEndDate": [
+      null,
+      null
+    ]
+  },
+  {
+    "title": "Boutique Fairs Singapore: The Gifting Edition 2023",
+    "imgSrc": "https://media.timeout.com/images/106059609/750/562/image.jpg",
+    "url": "https://www.timeout.com/singapore/shopping/boutiques-fair-singapore-the-gifting-edition",
+    "address": "F1 Pit Building, 1 Republic Blvd, Singapore, 038975",
+    "price": "$5",
+    "startEndDate": [
+      "2023-11-17T10:00:00+08:00",
+      "2023-11-19T10:00:00+08:00"
+    ]
+  },
+  {
+    "title": "Immersive Disney Animation",
+    "imgSrc": "https://media.timeout.com/images/106039940/750/562/image.jpg",
+    "url": "https://www.timeout.com/singapore/things-to-do/immersive-disney-animation",
+    "address": "Sands Theatre, Sands Theatre, Marina Bay Sands, Singapore, 018956",
+    "price": "TBA",
+    "startEndDate": [
+      "2023-11-18T00:00:00+08:00",
+      "2023-12-31T00:00:00+08:00"
+    ]
+  },
+  {
+    "title": "Whisky Live Singapore 2023",
+    "imgSrc": "https://media.timeout.com/images/106046798/750/562/image.jpg",
+    "url": "https://www.timeout.com/singapore/things-to-do/whisky-live-singapore-2023",
+    "address": "Singapore Flyer, 31 Raffles Ave, Singapore, 039804",
+    "price": "From $100",
+    "startEndDate": [
+      "2023-11-18T13:00:00+08:00",
+      "2023-11-19T13:00:00+08:00"
+    ]
+  },
+  {
+    "title": "Good Pet Fair",
+    "imgSrc": "https://media.timeout.com/images/106059604/750/562/image.jpg",
+    "url": "https://www.timeout.com/singapore/shopping/good-pet-fair",
+    "address": "Pasir Panjang Powerstation, 27 Pasir Panjang Rd, Singapore, 117537",
+    "price": "Free",
+    "startEndDate": [
+      "2023-11-17T10:00:00+08:00",
+      "2023-11-19T10:00:00+08:00"
+    ]
+  },
+  {
+    "title": "New2U Thrift Bazaar",
+    "imgSrc": "https://media.timeout.com/images/106061792/750/562/image.jpg",
+    "url": "https://www.timeout.com/singapore/shopping/new2u-thrift-bazaar",
+    "address": "New2U, 96 Waterloo St, Singapore, 187967",
+    "price": "Free",
+    "startEndDate": [
+      "2023-11-17T10:30:00+08:00",
+      "2023-11-19T10:30:00+08:00"
+    ]
+  },
+  {
+    "title": "Nintendo Pop-Up in Singapore",
+    "imgSrc": "https://media.timeout.com/images/106054571/750/562/image.jpg",
+    "url": "https://www.timeout.com/singapore/things-to-do/nintendo-pop-up",
+    "address": "Jewel Changi Airport, Jewel Changi Airport, 78 Airport Blvd, Singapore, 819666",
+    "price": null,
+    "startEndDate": [
+      "2023-11-17T00:00:00+08:00",
+      "2024-01-01T00:00:00+08:00"
+    ]
+  }
+]
