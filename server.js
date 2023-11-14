@@ -252,20 +252,20 @@ io.on("connection", (socket) => {
 });
 
 
-// // To run scrape.js code every hour
-// scrapePath = ' node ./scrape.js';
-// // hourly
-// cron.schedule('0 * * * *', () => {
-// //  7 days
-// // cron.schedule('0 0 * * 0', () => {
-//   exec(scrapePath, (error, stdout, stderr) => {
-//     if (error) {
-//       console.error(`Error executing script: ${error}`);
-//       return;
-//     }
-//     console.log(`Script output: ${stdout}`);
-//   });
-// });
+// To run scrape.js code every hour
+scrapePath = ' node ./scrape.js';
+// hourly
+cron.schedule('0 * * * *', () => {
+//  7 days
+// cron.schedule('0 0 * * 0', () => {
+  exec(scrapePath, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error executing script: ${error}`);
+      return;
+    }
+    console.log(`Script output: ${stdout}`);
+  });
+});
 
 
 io.on("connection", (socket) => {
