@@ -254,13 +254,15 @@ io.on("connection", (socket) => {
 
       // Prepare the review update
       let reviewUpdate = {};
-      reviewUpdate[`reviews.${username}`] = review;
 
       // Calculate the new average rating
       let newRating = rating;
       if (doc.reviews) {
         const numReviews = Object.keys(doc.reviews).length;
         const totalRating = doc.rating * numReviews;
+        let currReview = doc.reviews;
+        currReview[username] = review;
+        reviewUpdate = currReview;
         newRating = (totalRating + rating) / (numReviews + 1); // +1 for the new review
       }
 
