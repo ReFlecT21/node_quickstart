@@ -240,6 +240,50 @@ io.on("connection", (socket) => {
   });
 });
 
+io.on("connection", (socket) => {
+  socket.on("updateReview", async (markerId, review, rating, username) => {
+    try {
+      socket.emit("log", "Connecting to MongoDB database");
+      await client.connect();
+      socket.emit("log", "Connected to MongoDB database");
+      const database = client.db("FOMO");
+      const collection = database.collection("locations");
+
+      // Retrieve the current document
+      const doc = await collection.findOne({ _id: new ObjectId(markerId) });
+
+      // Prepare the review update
+      let reviewUpdate = {};
+      reviewUpdate[`reviews.${username}`] = review;
+
+      // Calculate the new average rating
+      let newRating = rating;
+      if (doc.reviews) {
+        const numReviews = Object.keys(doc.reviews).length;
+        const totalRating = doc.rating * numReviews;
+        newRating = (totalRating + rating) / (numReviews + 1); // +1 for the new review
+      }
+
+      socket.emit(
+        "log",
+        `Updating review in database: ${JSON.stringify(reviewUpdate)}`
+      );
+      const result = await collection.updateOne(
+        { _id: new ObjectId(review._id) },
+        { $set: reviewUpdate, $set: { rating: newRating } }
+      );
+      socket.emit("log", "Updated review in database");
+      io.emit("updatedReview", {
+        ...review,
+        rating: newRating,
+        reviews: reviewUpdate,
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  });
+});
+
 app.get("/getMarkers", async (req, res) => {
   try {
     await client.connect();
