@@ -172,40 +172,40 @@ watchCollection();
 // });
 
 // Adding Admin Markers to Database using scraped data
-app.post("/adminAddMarker", async (req, res)=> {
-  try {
-    const {marker, imageContent, fileName } = req.body;
+// app.post("/adminAddMarker", async (req, res)=> {
+//   try {
+//     const {marker, imageContent, fileName } = req.body;
 
-    const params = {
-      Bucket: awsConfig.bucketName,
-      Key: fileName, 
-      Body: imageContent,
-    };
+//     const params = {
+//       Bucket: awsConfig.bucketName,
+//       Key: fileName, 
+//       Body: imageContent,
+//     };
 
-    let imageUrl;
+//     let imageUrl;
 
-    try {
-      const uploadResult = await s3.upload(params).promise();
-      imageUrl = uploadResult.Location;
-      console.log('Image uploaded to:', imageUrl);
-    }catch(err){
-      console.error("Error uploading image:", err);
-      res.status(500).send('Failed to upload image to s3');
-      return;
-    }
-    await client.connect();
-    const database = client.db("FOMO");
-    const collection = database.collection('locations');
+//     try {
+//       const uploadResult = await s3.upload(params).promise();
+//       imageUrl = uploadResult.Location;
+//       console.log('Image uploaded to:', imageUrl);
+//     }catch(err){
+//       console.error("Error uploading image:", err);
+//       res.status(500).send('Failed to upload image to s3');
+//       return;
+//     }
+//     await client.connect();
+//     const database = client.db("FOMO");
+//     const collection = database.collection('locations');
     
-    marker.createAt = new Date();
-    marker.imageUrl = imageUrl;
-    const result = await collection.insertOne(marker);
-    res.status(200).send('Inserted marker into database');
-  } catch (e) {
-    console.error(e);
-    res.status(500).send('An error occured');
-  }
-});
+//     marker.createAt = new Date();
+//     marker.imageUrl = imageUrl;
+//     const result = await collection.insertOne(marker);
+//     res.status(200).send('Inserted marker into database');
+//   } catch (e) {
+//     console.error(e);
+//     res.status(500).send('An error occured');
+//   }
+// });
 
 io.on("connection", (socket) => {
   socket.on("addMarker", async (data) => {
