@@ -121,6 +121,7 @@ async function fetchTimeOutHotList() {
     return events;
 }
 
+// Wait for function to execute before adding to database
 fetchTimeOutHotList().then((events) => {
     const eventsJson = JSON.stringify(events, null, 2);
     scrapePath = path.join(__dirname, 'data', 'timeoutHotList.txt');
@@ -135,14 +136,17 @@ fetchTimeOutHotList().then((events) => {
     console.log(fetchedHotList);
 
     for (let event of fetchedHotList){
+        // if no address, skip event
         if (event.address == "" || event.address==null){
             console.log('No address for:', event.title)
             continue;
         }else{
+            // retrieving the coordinates for the address
             let address = event.address;
             let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
             axios.get(url)
             .then(response=> {
+                // if response data is not empty, add lat and lng to event 
                 if(response.data.results.length > 0){
                     let location = response.data.results[0].geometry.location;
                     console.log('Address for: ', event.title, ':', location.lat, location.lng);
@@ -158,6 +162,7 @@ fetchTimeOutHotList().then((events) => {
                 console.log('Error:', error.message);
             })
 
+            // uint8array to store image data;
             let imageContent;
             axios.get(event.imgSrc, {responseTye: 'arraybuffer'})
             .then(response => {
@@ -165,7 +170,9 @@ fetchTimeOutHotList().then((events) => {
             }).catch(error=> {
                 console.error('Error getting image data:', error);
             });
-    
+
+
+            // if event have lat and lng, add marker to database
             if (event.lat != 0 && event.lng != 0){
             const randomName = chance.name();
             let backendUrl = 'http://fomo-raw-1d33949ca4fc.herokuapp.com/adminAddMarker';
