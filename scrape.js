@@ -9,7 +9,7 @@ const Chance = require('chance');
 
 const axios = require('axios');
 const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-const chance = new Chance();
+const chance = new Chance()
 
 
 
