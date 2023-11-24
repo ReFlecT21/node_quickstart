@@ -14,10 +14,8 @@ const fs = require("fs");
 const path = require("path");
 const secret = crypto.randomBytes(64).toString("hex");
 const cron = require("node-cron");
-const { exec } = require('child_process');
+const { exec } = require("child_process");
 const app = express();
-
-
 
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
@@ -177,7 +175,7 @@ watchCollection();
 
 //     const params = {
 //       Bucket: awsConfig.bucketName,
-//       Key: fileName, 
+//       Key: fileName,
 //       Body: imageContent,
 //     };
 
@@ -195,7 +193,7 @@ watchCollection();
 //     await client.connect();
 //     const database = client.db("FOMO");
 //     const collection = database.collection('locations');
-    
+
 //     marker.createAt = new Date();
 //     marker.imageUrl = imageUrl;
 //     const result = await collection.insertOne(marker);
@@ -251,7 +249,6 @@ io.on("connection", (socket) => {
   });
 });
 
-
 // To run scrape.js code every hour
 // scrapePath = ' node ./scrape.js';
 // // hourly
@@ -266,7 +263,6 @@ io.on("connection", (socket) => {
 //     console.log(`Script output: ${stdout}`);
 //   });
 // });
-
 
 io.on("connection", (socket) => {
   socket.on("updateMarker", async (marker, username) => {
@@ -335,6 +331,11 @@ io.on("connection", (socket) => {
         { $set: { reviews: reviewUpdate, rating: newRating } }
       );
       socket.emit("log", "Updated review in database");
+      io.emit("updatedReview", {
+        markerId: markerId,
+        verify: username,
+        verificationDate: new Date(),
+      });
     } catch (e) {
       console.error(e);
     }
@@ -351,7 +352,7 @@ app.get("/getMarkers", async (req, res) => {
     // Find all markers in the collection
     const markers = await collection
       .find({})
-      .project({ verificationDate: 1, verify: 1 })
+      .project({ verificationDate: 1, verify: 1, rating: 1, reviews: 1 })
       .toArray();
 
     res.json({ success: true, markers });
@@ -400,7 +401,6 @@ app.get("/clearSessions", (req, res) => {
     }
   });
 });
-
 
 app.post("/insertUser", async (req, res) => {
   const { username, password } = req.body;
