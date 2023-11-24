@@ -172,13 +172,15 @@ watchCollection();
 app.post("/adminAddMarker", async (req, res)=> {
   try {
     const {marker, imageContent, fileName } = req.body;
-    let buffer = Buffer.from(imageContent);
+    // let buffer = Buffer.from(imageContent);
+    let uint8Array = new Uint8Array(imageContent);
 
     const params = {
       Bucket: awsConfig.bucketName,
       Key: fileName,
       // Body: imageContent,
-      Body: buffer,
+      // Body: buffer,
+      Body: uint8Array,
     };
 
     let imageUrl;
