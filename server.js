@@ -173,10 +173,12 @@ app.post("/adminAddMarker", async (req, res)=> {
   try {
     const {marker, imageContent, fileName } = req.body;
 
+    const buffer = Buffer.from(imageContent, 'base64');
+
     const params = {
       Bucket: awsConfig.bucketName,
       Key: fileName,
-      Body: imageContent,
+      Body: buffer,
     };
 
     let imageUrl;
