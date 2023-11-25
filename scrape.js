@@ -6,6 +6,7 @@ require('dotenv').config();
 const sharp = require('sharp');
 
 
+
 const Chance = require('chance');
 const chance = new Chance();
 
@@ -90,11 +91,11 @@ async function fetchTimeOutHotList() {
 
 async function fetchTimeOutHotListWCoords(){
     try {
-        // const events = await fetchTimeOutHotList();
-        // console.log(events);
-        // const eventsJson = JSON.stringify(events, null, 2);
-        // scrapePath = path.join(__dirname, 'data', 'timeoutHotList.txt');
-        // fs.writeFileSync(scrapePath, eventsJson);
+        const events = await fetchTimeOutHotList();
+        console.log(events);
+        const eventsJson = JSON.stringify(events, null, 2);
+        scrapePath = path.join(__dirname, 'data', 'timeoutHotList.txt');
+        fs.writeFileSync(scrapePath, eventsJson);
 
         const hotListJson = fs.readFileSync('data/timeoutHotList.txt', 'utf8');
         const fetchedHotList = JSON.parse(hotListJson); 
