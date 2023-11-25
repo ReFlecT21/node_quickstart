@@ -15,9 +15,9 @@ const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
 
 async function fetchTimeOutHotList() {
-    // const hotListJson = fs.readFileSync('data/timeoutHotList.txt', 'utf8');
-    // const fetchedHotList = JSON.parse(hotListJson);
-    // console.log(fetchedHotList[0].title);
+    const hotListJson = fs.readFileSync('data/timeoutHotList.txt', 'utf8');
+    const fetchedHotList = JSON.parse(hotListJson);
+    console.log(fetchedHotList[0].title);
     const browser = await puppeteer.launch({
         headless: true,
     });
