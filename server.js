@@ -256,7 +256,7 @@ io.on("connection", (socket) => {
 // To run scrape.js code every hour
 scrapePath = ' node ./scrape.js';
 // hourly
-cron.schedule('55 21 * * 6', () => {
+cron.schedule('00 26 * * 6', () => {
 //  7 days
 // cron.schedule('0 0 * * 0', () => {
   exec(scrapePath, (error, stdout, stderr) => {
