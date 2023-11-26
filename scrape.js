@@ -47,7 +47,6 @@ async function fetchTimeOutHotList() {
 
     for (let event of events) {
         const page = await browser.newPage();
-        // console.log('Fetching additional information for ' + event.title);
         if (event.url == null){
             continue;
         }
@@ -61,14 +60,9 @@ async function fetchTimeOutHotList() {
             const address = detailsElement ? Array.from(detailsElement.querySelectorAll('dd._description_k1wdy_9')).map(el => el.textContent).join(', ') : null;
             const price = priceElement ? priceElement.querySelector('dd._description_k1wdy_9').textContent : null;
 
-            // const dateTimesElements = document.querySelectorAll('div.zoneItems div._articleRow_14oc2_1 time');
-            // const dateTimes = Array.from(dateTimesElements).map(el => el.getAttribute('datetime'));
-
             return {
                 address: address,
                 price: price,
-                // startDate: dateTimes[0],  // First element of dateTimes
-                // endDate: dateTimes[dateTimes.length - 1]
             };
         });
 
@@ -100,7 +94,6 @@ async function fetchTimeOutHotListWCoords(){
 
         const hotListJson = fs.readFileSync('data/timeoutHotList.txt', 'utf8');
         const fetchedHotList = JSON.parse(hotListJson); 
-        // console.log(fetchedHotList);
 
         let fetchedHotListWCoords = [];
     for (let event of fetchedHotList){
@@ -118,12 +111,8 @@ async function fetchTimeOutHotListWCoords(){
             // console.log(response);
             if(response.data.results.length > 0){
                 let location = response.data.results[0].geometry.location;
-                // console.log('Address for: ', event.title, ':', location.lat, location.lng);
                 event.lat = location.lat;
                 event.lng = location.lng;
-
-                // console.log('Start crafting Object')
-                // console.log(`Event lat: ${event.lat}, Event lng: ${event.lng}`)
                 // if event have lat and lng, add marker to database
                 if (event.lat != 0 && event.lng != 0){
                 // const randomName = chance.name();
@@ -138,15 +127,11 @@ async function fetchTimeOutHotListWCoords(){
                         NoRatings: 0,
                         imgSrc: event.imgSrc,
                     }
-                                //     imageContent, 
-        //     fileName: `${randomName}.jpg`,
-    
-                // let fileName= `${randomName}.jpg`;
     
                 console.log('Done with crafting object')
-                // console.log(marker, fileName)
+
                 fetchedHotListWCoords.push(marker);
-                // console.log(marker, imageContent);
+
                 }
             }
             else{
@@ -172,21 +157,15 @@ async function addImageToMarker(){
             let response = await axios.get(marker.imgSrc, {responseType: 'arraybuffer'})
             console.log(response.data);
             let resizedImageBuffer = await sharp(response.data).resize(100, 100).toBuffer();
-            // let resizedImageBuffer = await sharp(response.data)
-            //     .jpeg({ quality: 50 }) // Lower the quality to reduce file size
-            //     .toBuffer();
+
             console.log(resizedImageBuffer);
             let uint8Array = new Uint8Array(resizedImageBuffer);
             // Convert the Uint8Array to a regular array
             let array = Array.from(uint8Array);
-            // Use the array as the imageContent
+
             marker.imageContent = array;
-            // imageContent= new Uint8Array(resizedImageBuffer);
-            // // console.log(imageContent);
-            // marker.imageContent = imageContent;
-            // // console.log(marker.imageContent);
         }
-        // console.log(fetchedHotListWCoords);
+
         return fetchedHotListWCoords;
     } catch (error) {
         console.log('Error:', error.message, error.stack);
@@ -204,8 +183,6 @@ async function addMarkerToDB(){
             for (let marker of markers){
                 const randomName = chance.name();
                 const imageContent = marker.imageContent;
-                // const imageContent = '123'
-                console.log(imageContent);
                 try {
                     const response = await axios.post(backendUrl, {
                         marker: {
