@@ -20,7 +20,7 @@ async function fetchTimeOutHotList() {
     const fetchedHotList = JSON.parse(hotListJson);
     console.log(fetchedHotList[0].title);
     const browser = await puppeteer.launch({
-        headless: true,
+        // headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
