@@ -21,7 +21,7 @@ async function fetchTimeOutHotList() {
     console.log(fetchedHotList[0].title);
     const browser = await puppeteer.launch({
         // headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--single-process']
     });
     const page = await browser.newPage();
     await page.goto('https://www.timeout.com/singapore/things-to-do/the-time-out-singapore-hotlist');
