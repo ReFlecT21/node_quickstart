@@ -28,7 +28,7 @@ const awsConfig = {
   region: "ap-southeast-1",
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  bucketName: "fomos3",
+  bucketName: process.env.AWS_S3_BUCKET_NAME,
 };
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, "access.log"),
@@ -169,9 +169,9 @@ watchCollection();
 // });
 
 // Adding Admin Markers to Database using scraped data
-app.post("/adminAddMarker", async (req, res)=> {
+app.post("/adminAddMarker", async (req, res) => {
   try {
-    const {marker, imageContent, fileName } = req.body;
+    const { marker, imageContent, fileName } = req.body;
     // let buffer = Buffer.from(imageContent);
     let uint8Array = new Uint8Array(imageContent);
 
@@ -188,23 +188,23 @@ app.post("/adminAddMarker", async (req, res)=> {
     try {
       const uploadResult = await s3.upload(params).promise();
       imageUrl = uploadResult.Location;
-      console.log('Image uploaded to:', imageUrl);
-    }catch(err){
+      console.log("Image uploaded to:", imageUrl);
+    } catch (err) {
       console.error("Error uploading image:", err);
-      res.status(500).send('Failed to upload image to s3');
+      res.status(500).send("Failed to upload image to s3");
       return;
     }
     await client.connect();
     const database = client.db("FOMO");
-    const collection = database.collection('locations');
+    const collection = database.collection("locations");
 
     marker.createAt = new Date();
     marker.imageUrl = imageUrl;
     const result = await collection.insertOne(marker);
-    res.status(200).send('Inserted marker into database');
+    res.status(200).send("Inserted marker into database");
   } catch (e) {
     console.error(e);
-    res.status(500).send('An error occured');
+    res.status(500).send("An error occured");
   }
 });
 
@@ -254,11 +254,11 @@ io.on("connection", (socket) => {
 });
 
 // To run scrape.js code every hour
-scrapePath = ' node ./scrape.js';
+scrapePath = " node ./scrape.js";
 // hourly
-cron.schedule('30 4 * * 0', () => {
-//  7 days
-// cron.schedule('0 0 * * 0', () => {
+cron.schedule("30 4 * * 0", () => {
+  //  7 days
+  // cron.schedule('0 0 * * 0', () => {
   exec(scrapePath, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error executing script: ${error}`);
@@ -410,7 +410,9 @@ app.post("/insertUser", async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    console.log("inserting user");
     await client.connect();
+    console.log("connected to database");
 
     const database = client.db("FOMO");
     const collection = database.collection("userinfo");
