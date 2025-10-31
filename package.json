@@ -8,6 +8,9 @@
     "start": "node server.js",
     "heroku-postbuild": "mkdir ./.cache && mv /app/.cache/puppeteer ./.cache"
   },
+  "config": {
+    "puppeteer_skip_chromium_download": "true"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
