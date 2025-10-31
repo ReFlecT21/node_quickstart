@@ -2,10 +2,14 @@ services:
   - type: web
     name: node-quickstart
     runtime: node
-    buildCommand: npm install
+    buildCommand: npm install --omit=optional
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: 22.16.0
       - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
-        value: true
+        value: "true"
+      - key: PUPPETEER_SKIP_DOWNLOAD
+        value: "true"
+      - key: npm_config_puppeteer_skip_chromium_download
+        value: "true"
