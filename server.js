@@ -314,7 +314,7 @@ io.on("connection", (socket) => {
 
       // Calculate the new average rating
       let newRating = rating;
-      if (doc.reviews != 0) {
+      if (doc.reviews && typeof doc.reviews === 'object' && Object.keys(doc.reviews).length > 0) {
         const numReviews = Object.keys(doc.reviews).length;
         const totalRating = doc.rating * numReviews;
         let currReview = doc.reviews;
